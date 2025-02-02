@@ -1,0 +1,53 @@
+class Particle {
+  constructor(canvas) {
+    this.canvas = canvas;
+    this.ctx = canvas.getContext('2d');
+    this.x = Math.random() * canvas.width;
+    this.y = Math.random() * canvas.height;
+    this.velocity = { x: (Math.random() - 0.5)*2, y: (Math.random() - 0.5)*2 };
+    this.radius = Math.random() * 3 + 1;
+  }
+
+  update(particles) {
+    // 边界反弹
+    if(this.x < 0 || this.x > this.canvas.width) this.velocity.x *= -1;
+    if(this.y < 0 || this.y > this.canvas.height) this.velocity.y *= -1;
+    
+    // 粒子间作用力
+    particles.forEach(p => {
+      if(p !== this) {
+        const dx = p.x - this.x;
+        const dy = p.y - this.y;
+        const dist = Math.sqrt(dx*dx + dy*dy);
+        if(dist < 50) {
+          this.velocity.x += dx * 0.001;
+          this.velocity.y += dy * 0.001;
+        }
+      }
+    });
+
+    this.x += this.velocity.x;
+    this.y += this.velocity.y;
+  }
+
+  draw() {
+    this.ctx.beginPath();
+    this.ctx.arc(this.x, this.y, this.radius, 0, Math.PI*2);
+    this.ctx.fillStyle = `rgba(100, 200, 255, ${1 - this.radius/4})`;
+    this.ctx.fill();
+  }
+}
+
+// 初始化100个粒子
+const canvas = document.getElementById('canvas');
+const particles = Array.from({length: 100}, () => new Particle(canvas));
+
+function animate() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  particles.forEach(p => {
+    p.update(particles);
+    p.draw();
+  });
+  requestAnimationFrame(animate);
+}
+animate();
