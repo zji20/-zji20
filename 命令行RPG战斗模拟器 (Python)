@@ -1,0 +1,48 @@
+import random
+from enum import Enum
+
+class ClassType(Enum):
+    WARRIOR = {'hp': 120, 'attack': 15}
+    MAGE = {'hp': 80, 'attack': 25}
+    ROGUE = {'hp': 100, 'attack': 20}
+
+class Player:
+    def __init__(self, name, class_type):
+        self.name = name
+        self.hp = class_type.value['hp']
+        self.attack = class_type.value['attack']
+        self.skills = {
+            'WARRIOR': ['旋风斩', '盾击'],
+            'MAGE': ['火球术', '冰霜新星'],
+            'ROGUE': ['背刺', '毒刃']
+        }[class_type.name]
+    
+    def take_damage(self, damage):
+        self.hp = max(0, self.hp - damage)
+        return self.hp > 0
+
+def battle(player1, player2):
+    print(f"\n⚔️ {player1.name} vs {player2.name}!")
+    
+    while True:
+        # 玩家1行动
+        skill = random.choice(player1.skills)
+        dmg = player1.attack + random.randint(-3, 5)
+        print(f"{player1.name} 使用 [{skill}] 造成 {dmg}点伤害")
+        if not player2.take_damage(dmg):
+            print(f"🎉 {player1.name} 获胜！")
+            return
+
+        # 玩家2行动
+        skill = random.choice(player2.skills)
+        dmg = player2.attack + random.randint(-3, 5)
+        print(f"{player2.name} 使用 [{skill}] 造成 {dmg}点伤害")
+        if not player1.take_damage(dmg):
+            print(f"🎉 {player2.name} 获胜！")
+            return
+
+# 创建角色
+warrior = Player("亚瑟", ClassType.WARRIOR)
+mage = Player("梅林", ClassType.MAGE)
+
+battle(warrior, mage)
